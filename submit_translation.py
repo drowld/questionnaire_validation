@@ -9,6 +9,40 @@ FILE_PROPOSALS = 'proposed_translations_fr.json'
 
 st.set_page_config(layout="wide", page_title="Soumettre une Traduction")
 
+# --- INJECTION DU CSS PERSONNALISÉ ---
+# Ceci cible les champs de saisie (text_area et text_input) à l'intérieur du formulaire
+# en se basant sur leur type et leur ordre d'apparition.
+custom_css = """
+<style>
+/* QUESTION (Bleu - st.info) */
+/* Cible le premier st.text_area dans le formulaire */
+div[data-testid="stForm"] div[data-testid="stTextarea"]:nth-of-type(1) div[data-baseweb="textarea"] {
+    border: 1px solid #007bff; 
+    border-left: 5px solid #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+/* CORRECT (Vert - st.success) */
+/* Cible le premier st.text_input (qui est la réponse correcte) */
+div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(1) div[data-baseweb="input"] {
+    border: 1px solid #28a745; 
+    border-left: 5px solid #28a745;
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.2);
+}
+
+/* INCORRECT 1 & 2 (Rouge - st.error) */
+/* Cible les deux st.text_input suivants */
+div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(2) div[data-baseweb="input"],
+div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(3) div[data-baseweb="input"] {
+    border: 1px solid #dc3545; 
+    border-left: 5px solid #dc3545;
+    box-shadow: 0 0 5px rgba(220, 53, 69, 0.2);
+}
+</style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
+
+
 # CHARGEMENT DES DONNÉES
 @st.cache_data
 def load_data():

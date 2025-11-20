@@ -9,29 +9,42 @@ FILE_PROPOSALS = 'proposed_translations_fr.json'
 
 st.set_page_config(layout="wide", page_title="Soumettre une Traduction")
 
-# --- INJECTION DU CSS PERSONNALISÉ (Pour border les champs de saisie) ---
+# --- INJECTION DU CSS PERSONNALISÉ (Pour un look uniforme) ---
 custom_css = """
 <style>
+/* Le CSS cible les div de Streamlit générés pour les champs de saisie
+   et leur applique un fond et une bordure colorés pour imiter les conteneurs st.info/success/error.
+*/
+
+/* Styles communs pour les champs de saisie (pour l'alignement) */
+div[data-testid="stForm"] div[data-testid="stTextarea"] div[data-baseweb="textarea"] > textarea,
+div[data-testid="stForm"] div[data-testid="stTextInput"] div[data-baseweb="input"] > input {
+    /* Ajoute un padding interne pour que le texte ne touche pas la bordure colorée */
+    padding: 10px; 
+    /* Réinitialise la bordure par défaut pour appliquer notre style */
+    border: none !important; 
+}
+
 /* QUESTION (Bleu - st.info) */
+/* Cible le premier st.text_area (la question) */
 div[data-testid="stForm"] div[data-testid="stTextarea"]:nth-of-type(1) div[data-baseweb="textarea"] {
-    border: 1px solid #007bff; 
-    border-left: 5px solid #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+    background-color: #e6f0ff; /* Fond bleu très clair */
+    border: 1px solid #007bff; /* Bordure bleue foncée */
 }
 
 /* CORRECT (Vert - st.success) */
+/* Cible le premier st.text_input (réponse correcte) */
 div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(1) div[data-baseweb="input"] {
-    border: 1px solid #28a745; 
-    border-left: 5px solid #28a745;
-    box-shadow: 0 0 5px rgba(40, 167, 69, 0.2);
+    background-color: #f0fff0; /* Fond vert très clair */
+    border: 1px solid #28a745; /* Bordure verte foncée */
 }
 
 /* INCORRECT 1 & 2 (Rouge - st.error) */
+/* Cible les deux st.text_input suivants */
 div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(2) div[data-baseweb="input"],
 div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(3) div[data-baseweb="input"] {
-    border: 1px solid #dc3545; 
-    border-left: 5px solid #dc3545;
-    box-shadow: 0 0 5px rgba(220, 53, 69, 0.2);
+    background-color: #fff0f0; /* Fond rouge très clair */
+    border: 1px solid #dc3545; /* Bordure rouge foncée */
 }
 </style>
 """
@@ -143,20 +156,21 @@ else:
         with st.form(key='proposal_form'):
             
             # QUESTION - Bordure BLEUE
+            # Uniquement le placeholder (texte gris clair) pour guider
             new_q = st.text_area("Question", value=initial_q, height=100, label_visibility="collapsed", 
-                                 placeholder="ℹ️ Entrez la question traduite ici...")
+                                 placeholder="ℹ️ Entrez la question traduite ici (Bleu pour la question)...")
             
             # CORRECT - Bordure VERTE
             new_c = st.text_input("Réponse Correcte", value=initial_c, label_visibility="collapsed",
-                                  placeholder="✅ Entrez la réponse correcte traduite ici...")
+                                  placeholder="✅ Entrez la réponse correcte traduite ici (Vert pour le correct)...")
             
             # INCORRECT 1 - Bordure ROUGE
             new_i1 = st.text_input("Incorrecte 1", value=initial_i1, label_visibility="collapsed",
-                                   placeholder="❌ Entrez la première mauvaise réponse traduite ici...")
+                                   placeholder="❌ Entrez la première mauvaise réponse traduite ici (Rouge pour l'incorrect)...")
             
             # INCORRECT 2 - Bordure ROUGE
             new_i2 = st.text_input("Incorrecte 2", value=initial_i2, label_visibility="collapsed",
-                                   placeholder="❌ Entrez la deuxième mauvaise réponse traduite ici...")
+                                   placeholder="❌ Entrez la deuxième mauvaise réponse traduite ici (Rouge pour l'incorrect)...")
             
             # --- NAVIGATION AND SUBMIT ---
             st.divider()

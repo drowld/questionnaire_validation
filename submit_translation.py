@@ -9,13 +9,10 @@ FILE_PROPOSALS = 'proposed_translations_fr.json'
 
 st.set_page_config(layout="wide", page_title="Soumettre une Traduction")
 
-# --- INJECTION DU CSS PERSONNALISÉ ---
-# Ceci cible les champs de saisie (text_area et text_input) à l'intérieur du formulaire
-# en se basant sur leur type et leur ordre d'apparition.
+# --- INJECTION DU CSS PERSONNALISÉ (Pour border les champs de saisie) ---
 custom_css = """
 <style>
 /* QUESTION (Bleu - st.info) */
-/* Cible le premier st.text_area dans le formulaire */
 div[data-testid="stForm"] div[data-testid="stTextarea"]:nth-of-type(1) div[data-baseweb="textarea"] {
     border: 1px solid #007bff; 
     border-left: 5px solid #007bff;
@@ -23,7 +20,6 @@ div[data-testid="stForm"] div[data-testid="stTextarea"]:nth-of-type(1) div[data-
 }
 
 /* CORRECT (Vert - st.success) */
-/* Cible le premier st.text_input (qui est la réponse correcte) */
 div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(1) div[data-baseweb="input"] {
     border: 1px solid #28a745; 
     border-left: 5px solid #28a745;
@@ -31,7 +27,6 @@ div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(1) div[data
 }
 
 /* INCORRECT 1 & 2 (Rouge - st.error) */
-/* Cible les deux st.text_input suivants */
 div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(2) div[data-baseweb="input"],
 div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(3) div[data-baseweb="input"] {
     border: 1px solid #dc3545; 
@@ -147,25 +142,21 @@ else:
         
         with st.form(key='proposal_form'):
             
-            # QUESTION (Visuel de st.info)
-            st.markdown("##### ℹ️ Question (Texte à traduire)")
-            # Champ de saisie simple pour un meilleur alignement
-            new_q = st.text_area("Question", value=initial_q, height=100, label_visibility="collapsed")
+            # QUESTION - Bordure BLEUE
+            new_q = st.text_area("Question", value=initial_q, height=100, label_visibility="collapsed", 
+                                 placeholder="ℹ️ Entrez la question traduite ici...")
             
-            # CORRECT (Visuel de st.success)
-            st.markdown("##### ✅ Réponse Correcte")
-            # Champ de saisie simple pour un meilleur alignement
-            new_c = st.text_input("Réponse Correcte", value=initial_c, label_visibility="collapsed")
+            # CORRECT - Bordure VERTE
+            new_c = st.text_input("Réponse Correcte", value=initial_c, label_visibility="collapsed",
+                                  placeholder="✅ Entrez la réponse correcte traduite ici...")
             
-            # INCORRECT 1 (Visuel de st.error)
-            st.markdown("##### ❌ Incorrecte 1")
-            # Champ de saisie simple pour un meilleur alignement
-            new_i1 = st.text_input("Incorrecte 1", value=initial_i1, label_visibility="collapsed")
+            # INCORRECT 1 - Bordure ROUGE
+            new_i1 = st.text_input("Incorrecte 1", value=initial_i1, label_visibility="collapsed",
+                                   placeholder="❌ Entrez la première mauvaise réponse traduite ici...")
             
-            # INCORRECT 2 (Visuel de st.error)
-            st.markdown("##### ❌ Incorrecte 2")
-            # Champ de saisie simple pour un meilleur alignement
-            new_i2 = st.text_input("Incorrecte 2", value=initial_i2, label_visibility="collapsed")
+            # INCORRECT 2 - Bordure ROUGE
+            new_i2 = st.text_input("Incorrecte 2", value=initial_i2, label_visibility="collapsed",
+                                   placeholder="❌ Entrez la deuxième mauvaise réponse traduite ici...")
             
             # --- NAVIGATION AND SUBMIT ---
             st.divider()

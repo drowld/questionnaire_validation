@@ -4,8 +4,8 @@ import os
 
 # --- CONFIGURATION ---
 FILE_GERMAN = 'input_data.json'
-FILE_FRENCH_VERIFIED = 'translated_data_fr.json' # Current verified version (for reference)
-FILE_PROPOSALS = 'proposed_translations_fr.json' # New file for suggestions
+FILE_FRENCH_VERIFIED = 'translated_data_fr.json' 
+FILE_PROPOSALS = 'proposed_translations_fr.json' 
 
 st.set_page_config(layout="wide", page_title="Soumettre une Traduction")
 
@@ -83,7 +83,7 @@ else:
 
     col1, col2 = st.columns(2)
 
-    # COLONNE GAUCHE : ALLEMAND & FRANÇAIS VÉRIFIÉ (Référence)
+    # COLONNE GAUCHE : ALLEMAND (Référence)
     with col1:
         st.subheader("🇩🇪 Allemand (Original)")
         st.info(f"**Question:** {data_de[idx]['question']}")
@@ -91,18 +91,20 @@ else:
         st.error(f"❌ {data_de[idx]['incorrect_1']}")
         st.error(f"❌ {data_de[idx]['incorrect_2']}")
         
+        # Affichage de la question vérifiée actuelle pour contexte (non éditable)
         st.divider()
-        st.subheader("🇫🇷 Version VÉRIFIÉE Actuelle")
-        st.caption("Ceci est la version actuellement validée. **Proposez des modifications dans la colonne de droite.**")
-        st.text_area("Question VÉR.", value=data_fr_verified[idx]['question'], disabled=True, height=100)
-        
-        current_proposal = proposals.get(str(idx), {})
+        st.subheader("🇫🇷 Version Actuelle VÉRIFIÉE (Référence)")
+        st.text("Ceci est la traduction actuellement utilisée :")
+        st.caption(data_fr_verified[idx]['question'])
+
 
     # COLONNE DROITE : PROPOSITION (Éditable)
     with col2:
         st.subheader("📝 Votre Nouvelle Proposition")
         
-        # Determine initial values: use existing proposal if available, otherwise use verified version
+        current_proposal = proposals.get(str(idx), {})
+        
+        # Déterminer les valeurs initiales : proposition existante ou version vérifiée
         initial_q = current_proposal.get('question', data_fr_verified[idx]['question'])
         initial_c = current_proposal.get('correct', data_fr_verified[idx]['correct'])
         initial_i1 = current_proposal.get('incorrect_1', data_fr_verified[idx]['incorrect_1'])
@@ -110,12 +112,25 @@ else:
 
         
         with st.form(key='proposal_form'):
-            new_q = st.text_area("Question Proposée", value=initial_q, height=100)
-            new_c = st.text_input("Réponse Correcte Proposée", value=initial_c)
-            new_i1 = st.text_input("Incorrecte 1 Proposée", value=initial_i1)
-            new_i2 = st.text_input("Incorrecte 2 Proposée", value=initial_i2)
+            
+            # QUESTION (st.info equivalent)
+            st.info("**Question**")
+            new_q = st.text_area("Question", value=initial_q, height=100, label_visibility="collapsed")
+            
+            # CORRECT (st.success equivalent)
+            st.success("✅ **Réponse Correcte**")
+            new_c = st.text_input("Réponse Correcte", value=initial_c, label_visibility="collapsed")
+            
+            # INCORRECT 1 (st.error equivalent)
+            st.error("❌ **Incorrecte 1**")
+            new_i1 = st.text_input("Incorrecte 1", value=initial_i1, label_visibility="collapsed")
+            
+            # INCORRECT 2 (st.error equivalent)
+            st.error("❌ **Incorrecte 2**")
+            new_i2 = st.text_input("Incorrecte 2", value=initial_i2, label_visibility="collapsed")
             
             # --- NAVIGATION AND SUBMIT ---
+            st.divider()
             c1, c2, c3 = st.columns([1, 1, 4])
             
             # Previous Button

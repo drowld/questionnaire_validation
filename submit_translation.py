@@ -9,42 +9,45 @@ FILE_PROPOSALS = 'proposed_translations_fr.json'
 
 st.set_page_config(layout="wide", page_title="Soumettre une Traduction")
 
-# --- INJECTION DU CSS PERSONNALISÉ (Pour un look uniforme) ---
+# --- INJECTION DU CSS PERSONNALISÉ ---
 custom_css = """
 <style>
-/* Le CSS cible les div de Streamlit générés pour les champs de saisie
-   et leur applique un fond et une bordure colorés pour imiter les conteneurs st.info/success/error.
-*/
-
-/* Styles communs pour les champs de saisie (pour l'alignement) */
+/* Styles communs pour les champs de saisie */
 div[data-testid="stForm"] div[data-testid="stTextarea"] div[data-baseweb="textarea"] > textarea,
 div[data-testid="stForm"] div[data-testid="stTextInput"] div[data-baseweb="input"] > input {
-    /* Ajoute un padding interne pour que le texte ne touche pas la bordure colorée */
     padding: 10px; 
-    /* Réinitialise la bordure par défaut pour appliquer notre style */
     border: none !important; 
 }
 
 /* QUESTION (Bleu - st.info) */
-/* Cible le premier st.text_area (la question) */
-div[data-testid="stForm"] div[data-testid="stTextarea"]:nth-of-type(1) div[data-baseweb="textarea"] {
+div[data-testid="stForm"] div[data-testid="stTextarea"]:nth-of-type(1) div[data-baseweb="textarea"],
+div[data-testid="stForm"] div[data-testid="stTextarea"]:nth-of-type(2) div[data-baseweb="textarea"] {
     background-color: #e6f0ff; /* Fond bleu très clair */
     border: 1px solid #007bff; /* Bordure bleue foncée */
 }
 
 /* CORRECT (Vert - st.success) */
-/* Cible le premier st.text_input (réponse correcte) */
-div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(1) div[data-baseweb="input"] {
+div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(1) div[data-baseweb="input"],
+div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(2) div[data-baseweb="input"] {
     background-color: #f0fff0; /* Fond vert très clair */
     border: 1px solid #28a745; /* Bordure verte foncée */
 }
 
 /* INCORRECT 1 & 2 (Rouge - st.error) */
-/* Cible les deux st.text_input suivants */
-div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(2) div[data-baseweb="input"],
-div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(3) div[data-baseweb="input"] {
+div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(3) div[data-baseweb="input"],
+div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(4) div[data-baseweb="input"],
+div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(5) div[data-baseweb="input"],
+div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(6) div[data-baseweb="input"] {
     background-color: #fff0f0; /* Fond rouge très clair */
     border: 1px solid #dc3545; /* Bordure rouge foncée */
+}
+
+/* Disable interaction styling for readonly fields */
+div[data-testid="stForm"] textarea:disabled,
+div[data-testid="stForm"] input:disabled {
+    background-color: inherit !important;
+    cursor: not-allowed;
+    opacity: 0.9;
 }
 </style>
 """
@@ -125,22 +128,43 @@ else:
 
     col1, col2 = st.columns(2)
 
-    # COLONNE GAUCHE : ALLEMAND (Référence)
+    # COLONNE GAUCHE : ALLEMAND (Référence - Readonly fields)
     with col1:
         st.subheader("🇩🇪 Allemand (Original)")
-        st.info(f"**Question:** {data_de[idx]['question']}")
-        st.success(f"✅ {data_de[idx]['correct']}")
-        st.error(f"❌ {data_de[idx]['incorrect_1']}")
-        st.error(f"❌ {data_de[idx]['incorrect_2']}")
         
-        # Affichage de la question vérifiée actuelle pour contexte (non éditable)
+        with st.form(key='german_form'):
+            st.text_area("Question", 
+                        value=data_de[idx]['question'], 
+                        height=100, 
+                        label_visibility="collapsed",
+                        disabled=True)
+            
+            st.text_input("Réponse Correcte", 
+                         value=data_de[idx]['correct'], 
+                         label_visibility="collapsed",
+                         disabled=True)
+            
+            st.text_input("Incorrecte 1", 
+                         value=data_de[idx]['incorrect_1'], 
+                         label_visibility="collapsed",
+                         disabled=True)
+            
+            st.text_input("Incorrecte 2", 
+                         value=data_de[idx]['incorrect_2'], 
+                         label_visibility="collapsed",
+                         disabled=True)
+            
+            # Dummy submit to satisfy form requirement (hidden)
+            st.form_submit_button("Submit", label_visibility="collapsed", disabled=True)
+        
+        # Affichage de la question vérifiée actuelle pour contexte
         st.divider()
         st.subheader("🇫🇷 Version VÉRIFIÉE Actuelle (Référence)")
         st.caption("La question actuellement validée est :")
         st.markdown(f"**{data_fr_verified[idx]['question']}**")
 
 
-    # COLONNE DROITE : PROPOSITION (Éditable)
+    # COLONNE DROITE : PROPOSITION (Editable)
     with col2:
         st.subheader("📝 Votre Nouvelle Proposition")
         
@@ -156,21 +180,29 @@ else:
         with st.form(key='proposal_form'):
             
             # QUESTION - Bordure BLEUE
-            # Uniquement le placeholder (texte gris clair) pour guider
-            new_q = st.text_area("Question", value=initial_q, height=100, label_visibility="collapsed", 
-                                 placeholder="ℹ️ Entrez la question traduite ici (Bleu pour la question)...")
+            new_q = st.text_area("Question", 
+                                value=initial_q, 
+                                height=100, 
+                                label_visibility="collapsed", 
+                                placeholder="ℹ️ Entrez la question traduite ici (Bleu pour la question)...")
             
             # CORRECT - Bordure VERTE
-            new_c = st.text_input("Réponse Correcte", value=initial_c, label_visibility="collapsed",
-                                  placeholder="✅ Entrez la réponse correcte traduite ici (Vert pour le correct)...")
+            new_c = st.text_input("Réponse Correcte", 
+                                 value=initial_c, 
+                                 label_visibility="collapsed",
+                                 placeholder="✅ Entrez la réponse correcte traduite ici (Vert pour le correct)...")
             
             # INCORRECT 1 - Bordure ROUGE
-            new_i1 = st.text_input("Incorrecte 1", value=initial_i1, label_visibility="collapsed",
-                                   placeholder="❌ Entrez la première mauvaise réponse traduite ici (Rouge pour l'incorrect)...")
+            new_i1 = st.text_input("Incorrecte 1", 
+                                  value=initial_i1, 
+                                  label_visibility="collapsed",
+                                  placeholder="❌ Entrez la première mauvaise réponse traduite ici (Rouge pour l'incorrect)...")
             
             # INCORRECT 2 - Bordure ROUGE
-            new_i2 = st.text_input("Incorrecte 2", value=initial_i2, label_visibility="collapsed",
-                                   placeholder="❌ Entrez la deuxième mauvaise réponse traduite ici (Rouge pour l'incorrect)...")
+            new_i2 = st.text_input("Incorrecte 2", 
+                                  value=initial_i2, 
+                                  label_visibility="collapsed",
+                                  placeholder="❌ Entrez la deuxième mauvaise réponse traduite ici (Rouge pour l'incorrect)...")
             
             # --- NAVIGATION AND SUBMIT ---
             st.divider()

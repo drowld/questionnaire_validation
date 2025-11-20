@@ -4,13 +4,12 @@ import os
 
 # --- CONFIGURATION ---
 FILE_GERMAN = 'input_data.json'
-FILE_FRENCH_VERIFIED = 'translated_data_fr.json' # The file that holds the final, verified data
-FILE_PROPOSALS = 'proposed_translations_fr.json' # The file that holds unreviewed suggestions
+FILE_FRENCH_VERIFIED = 'translated_data_fr.json' 
+FILE_PROPOSALS = 'proposed_translations_fr.json' 
 
 st.set_page_config(layout="wide", page_title="Validateur de Propositions (ADMIN)")
 
 # --- CHARGEMENT DES DONNÉES ---
-# Clear the cache every time this function is called to ensure we load the latest files
 @st.cache_data(ttl=1)
 def load_data():
     try:
@@ -22,7 +21,7 @@ def load_data():
             with open(FILE_FRENCH_VERIFIED, 'r', encoding='utf-8') as f:
                 data_fr_verified = json.load(f)
         else:
-            data_fr_verified = data_de.copy() # Use German as a placeholder if file is missing
+            data_fr_verified = data_de.copy() 
 
         # Load proposals
         if os.path.exists(FILE_PROPOSALS):
@@ -41,7 +40,6 @@ def load_data():
     return data_de, data_fr_verified, proposals, proposal_indices
 
 # --- LOGIQUE DE SAUVEGARDE ET DE GESTION DES PROPOSITIONS ---
-
 def update_files(index_to_update, proposal_data, action):
     # Retrieve current data (will use the cached version from load_data)
     data_de, data_fr_verified, proposals, proposal_indices = load_data()
@@ -104,23 +102,36 @@ else:
     with col2:
         st.subheader("🇫🇷 Version VÉRIFIÉE Actuelle")
         st.caption("Ceci est la version LIVE actuellement utilisée.")
-        st.text_area("Question VÉR.", value=data_fr_verified[current_idx]['question'], disabled=True, height=150, help="Version actuelle (Non modifiable ici)")
-        st.text_input("Correct VÉR.", value=data_fr_verified[current_idx]['correct'], disabled=True)
-        st.text_input("Incorrect 1 VÉR.", value=data_fr_verified[current_idx]['incorrect_1'], disabled=True)
-        st.text_input("Incorrect 2 VÉR.", value=data_fr_verified[current_idx]['incorrect_2'], disabled=True)
+        
+        # Use info/success/error for visual consistency
+        st.info(f"**Question:** {data_fr_verified[current_idx]['question']}")
+        st.success(f"✅ {data_fr_verified[current_idx]['correct']}")
+        st.error(f"❌ {data_fr_verified[current_idx]['incorrect_1']}")
+        st.error(f"❌ {data_fr_verified[current_idx]['incorrect_2']}")
         
     # --- COLUMN 3: PROPOSED FRENCH (EDITABLE DRAFT) ---
     with col3:
         st.subheader("📝 Votre Brouillon ÉDITABLE")
-        st.caption("Basé sur la proposition de la communauté. Modifiez si nécessaire.")
+        st.caption("Basé sur la proposition. Modifiez avant de commettre.")
         
         # Use a form to capture edits before commit
         with st.form(key="review_form", clear_on_submit=True):
-            # Pre-fill with the community's proposal
-            draft_q = st.text_area("Question", value=proposal['question'], height=150)
-            draft_c = st.text_input("Réponse Correcte", value=proposal['correct'])
-            draft_i1 = st.text_input("Incorrecte 1", value=proposal['incorrect_1'])
-            draft_i2 = st.text_input("Incorrecte 2", value=proposal['incorrect_2'])
+            # 1. QUESTION (st.info equivalent)
+            st.info("**Question**")
+            draft_q = st.text_area("Question", value=proposal['question'], height=150, label_visibility="collapsed")
+            
+            # 2. CORRECT (st.success equivalent)
+            st.success("✅ **Réponse Correcte**")
+            draft_c = st.text_input("Réponse Correcte", value=proposal['correct'], label_visibility="collapsed")
+            
+            # 3. INCORRECT 1 (st.error equivalent)
+            st.error("❌ **Incorrecte 1**")
+            draft_i1 = st.text_input("Incorrecte 1", value=proposal['incorrect_1'], label_visibility="collapsed")
+            
+            # 4. INCORRECT 2 (st.error equivalent)
+            st.error("❌ **Incorrecte 2**")
+            draft_i2 = st.text_input("Incorrecte 2", value=proposal['incorrect_2'], label_visibility="collapsed")
+
 
             # Action Buttons inside the form
             c_commit, c_reject = st.columns(2)

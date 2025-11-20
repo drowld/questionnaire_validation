@@ -49,7 +49,7 @@ idx = st.session_state.index
 
 # --- SAUVEGARDE DE LA PROPOSITION ---
 def save_proposal(index, q, c, i1, i2):
-    """Sauvegarde la proposition dans le fichier dédié."""
+    """Sauvegarde la proposition dans le fichier dédié et passe au suivant."""
     proposals[str(index)] = {
         'question': q,
         'correct': c,
@@ -57,11 +57,18 @@ def save_proposal(index, q, c, i1, i2):
         'incorrect_2': i2
     }
     
+    # Save immediately
     with open(FILE_PROPOSALS, 'w', encoding='utf-8') as f:
         json.dump(proposals, f, indent=4, ensure_ascii=False)
     
-    st.session_state.index += 1
-    st.rerun()
+    # Advance
+    if idx < len(data_de) - 1:
+        st.session_state.index += 1
+        st.rerun()
+    else:
+        st.balloons()
+        st.success("Félicitations ! Vous avez atteint la fin du fichier.")
+
 
 # --- INTERFACE UTILISATEUR ---
 if len(data_de) == 0:
@@ -85,8 +92,8 @@ else:
         st.error(f"❌ {data_de[idx]['incorrect_2']}")
         
         st.divider()
-        st.subheader("🇫🇷 Français (Version Actuelle VÉRIFIÉE)")
-        st.caption("Utilisez cette version comme base de travail.")
+        st.subheader("🇫🇷 Version VÉRIFIÉE Actuelle")
+        st.caption("Ceci est la version actuellement validée. **Proposez des modifications dans la colonne de droite.**")
         st.text_area("Question VÉR.", value=data_fr_verified[idx]['question'], disabled=True, height=100)
         
         current_proposal = proposals.get(str(idx), {})
@@ -108,21 +115,24 @@ else:
             new_i1 = st.text_input("Incorrecte 1 Proposée", value=initial_i1)
             new_i2 = st.text_input("Incorrecte 2 Proposée", value=initial_i2)
             
-            c1, c2 = st.columns(2)
-            submit = c1.form_submit_button("💾 Soumettre la Proposition & Suivant")
+            # --- NAVIGATION AND SUBMIT ---
+            c1, c2, c3 = st.columns([1, 1, 4])
+            
+            # Previous Button
+            if c1.form_submit_button("⬅️ Préc."):
+                 if idx > 0:
+                    st.session_state.index -= 1
+                    st.rerun()
+            
+            # Next Button
+            if c2.form_submit_button("➡️ Suiv."):
+                 # Check if we are at the end
+                if idx < len(data_de) - 1:
+                    st.session_state.index += 1
+                    st.rerun()
+
+            # Submit Button (Saves and moves to the next)
+            submit = c3.form_submit_button("💾 Soumettre la Proposition & Avancer", type="primary")
             
             if submit:
                 save_proposal(idx, new_q, new_c, new_i1, new_i2)
-
-    # NAVIGATION
-    st.divider()
-    c_prev, c_next = st.columns([1, 10])
-    if c_prev.button("⬅️ Précédent"):
-        if idx > 0:
-            st.session_state.index -= 1
-            st.rerun()
-    
-    # Check if we are at the end
-    if idx == len(data_de) - 1:
-        st.balloons()
-        st.success("Félicitations ! Vous avez atteint la fin. Attendez la validation de l'administrateur.")

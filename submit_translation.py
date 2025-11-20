@@ -93,9 +93,9 @@ else:
         
         # Affichage de la question vérifiée actuelle pour contexte (non éditable)
         st.divider()
-        st.subheader("🇫🇷 Version Actuelle VÉRIFIÉE (Référence)")
-        st.text("Ceci est la traduction actuellement utilisée :")
-        st.caption(data_fr_verified[idx]['question'])
+        st.subheader("🇫🇷 Version VÉRIFIÉE Actuelle (Référence)")
+        st.caption("La question actuellement validée est :")
+        st.markdown(f"**{data_fr_verified[idx]['question']}**")
 
 
     # COLONNE DROITE : PROPOSITION (Éditable)
@@ -113,20 +113,24 @@ else:
         
         with st.form(key='proposal_form'):
             
-            # QUESTION (st.info equivalent)
-            st.info("**Question**")
+            # QUESTION (Visuel de st.info)
+            st.markdown("##### ℹ️ Question (Texte à traduire)")
+            # Champ de saisie simple pour un meilleur alignement
             new_q = st.text_area("Question", value=initial_q, height=100, label_visibility="collapsed")
             
-            # CORRECT (st.success equivalent)
-            st.success("✅ **Réponse Correcte**")
+            # CORRECT (Visuel de st.success)
+            st.markdown("##### ✅ Réponse Correcte")
+            # Champ de saisie simple pour un meilleur alignement
             new_c = st.text_input("Réponse Correcte", value=initial_c, label_visibility="collapsed")
             
-            # INCORRECT 1 (st.error equivalent)
-            st.error("❌ **Incorrecte 1**")
+            # INCORRECT 1 (Visuel de st.error)
+            st.markdown("##### ❌ Incorrecte 1")
+            # Champ de saisie simple pour un meilleur alignement
             new_i1 = st.text_input("Incorrecte 1", value=initial_i1, label_visibility="collapsed")
             
-            # INCORRECT 2 (st.error equivalent)
-            st.error("❌ **Incorrecte 2**")
+            # INCORRECT 2 (Visuel de st.error)
+            st.markdown("##### ❌ Incorrecte 2")
+            # Champ de saisie simple pour un meilleur alignement
             new_i2 = st.text_input("Incorrecte 2", value=initial_i2, label_visibility="collapsed")
             
             # --- NAVIGATION AND SUBMIT ---

@@ -19,27 +19,29 @@ div[data-testid="stForm"] div[data-testid="stTextInput"] div[data-baseweb="input
     border: none !important; 
 }
 
-/* QUESTION (Bleu - st.info) */
-div[data-testid="stForm"] div[data-testid="stTextarea"]:nth-of-type(1) div[data-baseweb="textarea"],
-div[data-testid="stForm"] div[data-testid="stTextarea"]:nth-of-type(2) div[data-baseweb="textarea"] {
-    background-color: #e6f0ff; /* Fond bleu très clair */
-    border: 1px solid #007bff; /* Bordure bleue foncée */
+/* TARGET PROPOSAL FORM ONLY - All fields keep their color */
+/* Question - Bleu */
+div[data-testid="stForm"] div[data-testid="stTextarea"]:nth-of-type(1) div[data-baseweb="textarea"] {
+    background-color: #e6f0ff;
+    border: 1px solid #007bff;
 }
 
-/* CORRECT (Vert - st.success) */
-div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(1) div[data-baseweb="input"],
+/* Correct Answer - Vert */
+div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(1) div[data-baseweb="input"] {
+    background-color: #f0fff0;
+    border: 1px solid #28a745;
+}
+
+/* Incorrect 1 - Rouge */
 div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(2) div[data-baseweb="input"] {
-    background-color: #f0fff0; /* Fond vert très clair */
-    border: 1px solid #28a745; /* Bordure verte foncée */
+    background-color: #fff0f0;
+    border: 1px solid #dc3545;
 }
 
-/* INCORRECT 1 & 2 (Rouge - st.error) */
-div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(3) div[data-baseweb="input"],
-div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(4) div[data-baseweb="input"],
-div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(5) div[data-baseweb="input"],
-div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(6) div[data-baseweb="input"] {
-    background-color: #fff0f0; /* Fond rouge très clair */
-    border: 1px solid #dc3545; /* Bordure rouge foncée */
+/* Incorrect 2 - Rouge */
+div[data-testid="stForm"] div[data-testid="stTextInput"]:nth-of-type(3) div[data-baseweb="input"] {
+    background-color: #fff0f0;
+    border: 1px solid #dc3545;
 }
 
 /* Disable interaction styling for readonly fields */
@@ -132,30 +134,26 @@ else:
     with col1:
         st.subheader("🇩🇪 Allemand (Original)")
         
-        with st.form(key='german_form'):
-            st.text_area("Question", 
-                        value=data_de[idx]['question'], 
-                        height=100, 
-                        label_visibility="collapsed",
-                        disabled=True)
-            
-            st.text_input("Réponse Correcte", 
-                         value=data_de[idx]['correct'], 
-                         label_visibility="collapsed",
-                         disabled=True)
-            
-            st.text_input("Incorrecte 1", 
-                         value=data_de[idx]['incorrect_1'], 
-                         label_visibility="collapsed",
-                         disabled=True)
-            
-            st.text_input("Incorrecte 2", 
-                         value=data_de[idx]['incorrect_2'], 
-                         label_visibility="collapsed",
-                         disabled=True)
-            
-            # Dummy submit to satisfy form requirement (hidden)
-            st.form_submit_button("Submit", label_visibility="collapsed", disabled=True)
+        st.text_area("Question (DE)", 
+                    value=data_de[idx]['question'], 
+                    height=100, 
+                    label_visibility="collapsed",
+                    disabled=True)
+        
+        st.text_input("Réponse Correcte (DE)", 
+                     value=data_de[idx]['correct'], 
+                     label_visibility="collapsed",
+                     disabled=True)
+        
+        st.text_input("Incorrecte 1 (DE)", 
+                     value=data_de[idx]['incorrect_1'], 
+                     label_visibility="collapsed",
+                     disabled=True)
+        
+        st.text_input("Incorrecte 2 (DE)", 
+                     value=data_de[idx]['incorrect_2'], 
+                     label_visibility="collapsed",
+                     disabled=True)
         
         # Affichage de la question vérifiée actuelle pour contexte
         st.divider()
